@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Happy Birthday, Beautiful! 💕</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Playfair+Display:ital,wght=0,600;1,400&family=Montserrat:wght@300;500&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --rose-dark: #9D174D;
+            --pink-base: #FFDEE9;
+            --wine: #4C0519;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100dvh;
+            overflow: hidden;
+            background-color: var(--pink-base);
+            font-family: 'Montserrat', sans-serif;
+            perspective: 1500px; 
+        }
+
+        .scroll-container {
+            width: 100%;
+            height: 100dvh;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            transition: opacity 0.5s ease;
+        }
+
+        .scroll-container.locked {
+            overflow: hidden;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .section {
+            position: relative;
+            width: 100%;
+            height: 100dvh;
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .video-wrap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            will-change: transform, filter, opacity;
+            transition: transform 0.1s ease-out, filter 0.1s ease-out, opacity 0.1s ease-out;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .dim-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, rgba(15, 10, 25, 0.6) 0%, rgba(76, 5, 25, 0.45) 100%);
+            z-index: 2;
+        }
+
+        .ui-foreground {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            z-index: 3;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+            text-align: center;
+            will-change: opacity, transform;
+            transition: opacity 0.1s ease-out, transform 0.1s ease-out;
+        }
+
+        .welcome-title {
+            font-family: 'Dancing Script', cursive;
+            font-size: 3.5rem;
+            color: #FFF;
+            margin-bottom: 20px;
+            text-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            min-height: 5rem;
+        }
+
+        .welcome-subtitle {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 1.3rem;
+            color: var(--pink-base);
+            letter-spacing: 1px;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+            min-height: 2rem;
+        }
+
+        .scroll-hint {
+            position: absolute;
+            bottom: calc(40px + env(safe-area-inset-top));
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.7);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+
+        .scroll-hint.show {
+            opacity: 0.7;
+            animation: hintPulse 2s infinite ease-in-out;
+        }
+        
+        @keyframes hintPulse {
+            0%, 100% { transform: translate(-50%, 0); opacity: 0.4; }
+            50% { transform: translate(-50%, -8px); opacity: 0.9; }
+        }
+
+        .calendar-hotspot {
+            position: absolute;
+            top: 47%;  
+            left: 77.7%;   
+            width: 30px; 
+            height: 30px;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.01); 
+            cursor: pointer;
+            border-radius: 50%;
+            z-index: 10;
+        }
+
+        /* --- PAGE 3: STATIONERY LETTER OVERLAY --- */
+        #letterScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            overflow: hidden;
+            opacity: 0;
+            pointer-events: none;
+            transform-origin: left center;
+            transform: rotateY(90deg);
+            backface-visibility: hidden; 
+            transition: transform 1.2s cubic-bezier(0.25, 1, 0.3, 1), opacity 0.6s ease;
+            
+            background-image: url('letter_bg.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        #letterScreen.reveal {
+            opacity: 1;
+            pointer-events: auto;
+            transform: rotateY(0deg);
+        }
+
+        .letter-box-hotspot {
+            position: absolute;
+            top: 50%;         
+            left: 23%;        
+            width: 45%;       
+            height: 670px;          
+            overflow-y: auto;       
+            -webkit-overflow-scrolling: touch; 
+            transform: translate(-50%, -50%);
+            padding: 20px 14px;
+            border-radius: 12px;
+            z-index: 15;
+            background: rgba(255, 255, 255, 0); 
+        }
+
+        .letter-box-hotspot::-webkit-scrollbar { width: 4px; }
+        .letter-box-hotspot::-webkit-scrollbar-thumb { background: rgba(157, 23, 77, 0.2); border-radius: 10px; }
+
+        .letter-salutation { font-family: 'Dancing Script', cursive; font-size: 1.8rem; color: var(--rose-dark); margin-bottom: 12px; text-shadow: 1px 1px 0 #fff; text-align: left; min-height: 2.2rem;}
+        .letter-paragraphs { font-family: 'Playfair Display', serif; font-style: italic; font-size: 0.95rem; line-height: 1.6; color: var(--wine); text-align: left; }
+
+        .present-hunt-btn {
+            margin-top: 24px;
+            padding: 10px 24px;
+            background: white;
+            border: 2px solid var(--rose-dark);
+            border-radius: 20px;
+            color: var(--rose-dark);
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(157, 23, 77, 0.1);
+            transition: opacity 0.5s ease, transform 0.2s;
+            display: inline-block;
+            width: 100%; 
+            text-align: center;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .present-hunt-btn.show { opacity: 1; pointer-events: auto; }
+
+        /* --- PAGE 4: CANDLE BLOWING ROOM --- */
+        #candleScreen {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 20;
+            background: radial-gradient(circle at center, #FFF0F3 0%, var(--pink-base) 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center; 
+            align-items: center;
+            padding: 30px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.8s ease;
+            transform: none !important; 
+        }
+        #candleScreen.reveal { opacity: 1; pointer-events: auto; }
+
+        .cake-vector-frame {
+            position: relative;
+            width: 220px;
+            height: 220px;
+            margin-top: 30px;
+            animation: vectorCakeFloat 3.5s infinite ease-in-out;
+        }
+
+        @keyframes vectorCakeFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .wick-hotspot {
+            position: absolute;
+            top: 7.5%; 
+            left: 50%;
+            transform: translate(-50%, -100%);
+            width: 30px;
+            height: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            cursor: pointer;
+        }
+
+        .candle-flame-particle {
+            width: 12px;
+            height: 24px;
+            background: linear-gradient(to bottom, #FF930F, #FFE53B, #fff);
+            border-radius: 50% 50% 20% 20% / 60% 60% 40% 40%;
+            box-shadow: 0 0 20px #FF930F, 0 0 40px rgba(255,147,15,0.6);
+            animation: flameWobble 0.1s infinite alternate;
+        }
+        @keyframes flameWobble { to { transform: scaleX(1.1) rotate(2deg); } }
+
+        /* --- STAGE 5: TREE SCREEN BACKGROUND CANVAS --- */
+        #treeScreen {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 30;
+            background-image: url('tree_bg.jpg'); 
+            background-size: cover; 
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0; pointer-events: none;
+            transition: opacity 1s ease;
+        }
+        #treeScreen.reveal { opacity: 1; pointer-events: auto; }
+
+        .hotspot-node {
+            position: absolute;
+            border-radius: 12px;
+            cursor: pointer;
+            z-index: 40;
+            background: rgba(255, 255, 255, 0.01); 
+        }
+        .hotspot-node.opened {
+            background: rgba(255, 255, 255, 0.01) !important;
+            pointer-events: none;
+        }
+
+        /* --- STAGE 6: THE FINAL CLOSING OUTRO CARD --- */
+        #closingScreen {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 50;
+            background: radial-gradient(circle at center, #FFF5F7 0%, var(--pink-base) 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            text-align: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1.5s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        #closingScreen.reveal {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .closing-heart {
+            font-size: 4.5rem;
+            margin-bottom: 25px;
+            animation: heartThrob 2s infinite ease-in-out;
+        }
+        @keyframes heartThrob {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.12); }
+        }
+        .closing-title {
+            font-family: 'Dancing Script', cursive;
+            font-size: 3rem;
+            color: var(--rose-dark);
+            margin-bottom: 15px;
+        }
+        .closing-desc {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: var(--wine);
+            max-width: 280px;
+        }
+
+        /* --- UNBOXING MODAL RECONSTRUCTION --- */
+        .video-pop-modal {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 10, 25, 0.65);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 100;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        .video-pop-modal.show { display: flex; opacity: 1; pointer-events: auto; }
+
+        .modal-content-card {
+            background: white;
+            width: 100%;
+            max-width: 310px;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 20px 45px rgba(0,0,0,0.25);
+            text-align: center;
+            position: relative;
+        }
+
+        .unboxing-video-frame {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .prize-reveal-layer { padding: 30px 20px; display: none; }
+        .prize-reveal-layer.active { display: block; }
+
+        .prize-icon { font-size: 3.5rem; margin-bottom: 10px; display: block; }
+        .prize-title { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--rose-dark); margin-bottom: 8px; }
+        .prize-text { font-size: 0.9rem; color: #64748B; line-height: 1.5; margin-bottom: 20px; }
+
+        .gopay-claim-btn {
+            display: block; width: 100%; padding: 14px;
+            background: #00AED6; color: white;
+            text-decoration: none; font-weight: 700; letter-spacing: 1px;
+            border-radius: 14px; box-shadow: 0 5px 15px rgba(0,174,214,0.3);
+            text-transform: uppercase; font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="bgMusic" src="music.mp3" loop></audio>
+
+    <div class="scroll-container" id="mainScroller">
+        <section class="section">
+            <div class="video-wrap" id="vWrap1">
+                <video autoplay loop muted playsinline webkit-playsinline><source src="carousel.mp4" type="video/mp4"></video>
+                <div class="dim-overlay"></div>
+            </div>
+            <div class="ui-foreground" id="uiFx1">
+                <h1 class="welcome-title" id="animateTitle">Happy Birthday Sayangkuuu!!</h1>
+                <p class="welcome-subtitle" id="animateSubtitle">10/05/2026</p>
+                <div class="scroll-hint" id="scrollHintArrow">Scroll ➔</div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="video-wrap" id="vWrap2">
+                <video autoplay loop muted playsinline webkit-playsinline><source src="calendar1.mp4" type="video/mp4"></video>
+            </div>
+            <div class="ui-foreground">
+                <div class="calendar-hotspot" id="june10Target"></div>
+            </div>
+        </section>
+    </div>
+
+    <div id="letterScreen">
+        <div class="letter-box-hotspot">
+            <h2 class="letter-salutation" id="letterTitle">Bunga Mataharikuhhh</h2>
+            <p class="letter-paragraphs" id="letterBody">HAPPY BIRTHDAYYYY CINTAKUUUU!! akhirnya setelah sekian lama, hari ini dateng juga yak :v suka gasuka, bodo amat, aku bakalan tetep ngerayain, apa urusan kamu sama keluarga kamu yang ngebuat kamu ga suka hari jadi kamu itu bukan urusan aku. Aku cuman mau bilang makasih banyak banget karena kamu uda mau menerima aku, segala kekurangan, and kelebihan aku, makaciww uda beri aku kesempatan buat jadi pacar kamu, di tanggal 10 ini juga kita uda berjalan 10 bulan hubungan kita, and gada 1 hari pun aku pernah ngerasa bosen sama kamu, tiap hari sentiasa adaaaa ajaa ulahnya BAHAHAHHA, aku tau kamu banyak masalah pribadi kamu yang kamu ga ceritain, tapi kamu tetep gapernah ngebawa vibe2 negatif dari luar ke dalem hubungan kita, sentiasa aman tenteram damai tanpa ada ribut gede kecuali soal nyebelin mah b aja :v jujur aku besyukur and beruntung banget bisa ngedapetin kamu jadi pendamping idup akuh, agak lebay tapi jyujyur iyak, makaciww cayang sentiasa sabar, baik, and sentiasa ngelayanin ke gajean random aku, nemenin aku dari jauh, and selalu jadi tempat pulang paling nyaman buat aku.<br><br>Semoga di umur yang baru ini kamu makin bahagia, semua impian, harapan, and cita2 yang sering kamu mimpikan bisa terwujud satu per satu, and pastinya tetep jadi orang yang ceria ya, jangan sedih2 muluu, aku tau kamu cape saying, tapi gapapa, walau apapun yang jadi, aku sentiasa ada yaww babeee, gabakalan kemana2, jangan pernah bosen ngadepin segala kegabutan aku, karna aku pun ga pernah akan bosen buat selalu saying, ngejaga, and semangatin kamu di setiap langkah kamu kedepan. Enjoy your special day babe, I WUVV UUU SOO MUCHH DUNIAKUUUU!!💕</p>
+            <button class="present-hunt-btn" id="nextToTreeBtn">Tiup Lilin! 🎂</button>
+        </div>
+    </div>
+
+    <div id="candleScreen">
+        <h2 style="font-family: 'Playfair Display', serif; font-style: italic; color: var(--rose-dark); text-align: center; margin-bottom: 10px;">Tutup mata kamuu</h2>
+        <p style="font-size: 0.9rem; color: var(--wine); opacity: 0.8; text-align: center;">Tiup lilinnya 💖</p>
+        <div class="cake-vector-frame">
+            <svg viewBox="0 0 200 200" width="100%" height="100%" style="display: block;">
+                <ellipse cx="100" cy="170" rx="90" ry="18" fill="#FFFFFF" stroke="#4C0519" stroke-width="3"/>
+                <ellipse cx="100" cy="170" rx="80" ry="12" fill="#F3E1E4"/>
+                <path d="M 30 110 L 30 160 A 70 14 0 0 0 170 160 L 170 110 Z" fill="#FF8DA1" stroke="#4C0519" stroke-width="3" stroke-linejoin="round"/>
+                <ellipse cx="100" cy="110" rx="70" ry="14" fill="#FFEAEF" stroke="#4C0519" stroke-width="3"/>
+                <path d="M 30 110 Q 45 125 60 112 Q 75 128 90 112 Q 115 128 135 112 Q 155 125 170 110" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
+                <path d="M 50 60 L 50 100 A 50 10 0 0 0 150 100 L 150 60 Z" fill="#FFFDF9" stroke="#4C0519" stroke-width="3" stroke-linejoin="round"/>
+                <ellipse cx="100" cy="60" rx="50" ry="10" fill="#FFFDF9" stroke="#4C0519" stroke-width="3"/>
+                <path d="M 100 42 C 90 42 88 52 100 58 C 112 52 110 42 100 42 Z" fill="#E11D48"/>
+                <rect x="96" y="15" width="8" height="32" fill="#22D3EE" rx="2" stroke="#4C0519" stroke-width="2.5"/>
+                <path d="M 96 22 L 104 18 M 96 32 L 104 28 M 96 42 L 104 38" stroke="#FFFFFF" stroke-width="2"/>
+            </svg>
+            <div class="wick-hotspot" id="candleFlameWrapper"><div class="candle-flame-particle" id="candleFlame"></div></div>
+        </div>
+    </div>
+
+    <div id="treeScreen"></div>
+
+    <div id="closingScreen">
+        <div class="closing-heart">❤️</div>
+        <h2 class="closing-title">Semoga kamu suka yaww sayangg</h2>
+        <p class="closing-desc">mianhaee cuman simple2 aja sayangg, tapi harap2 aja kamu suka yaaa, sekali lagi, HAPPY BIRTHDAYY SAYANGKUUU, I WUVV UUU SO MUCHHH BABEE! 💕</p>
+    </div>
+
+    <div class="video-pop-modal" id="videoModal">
+        <div class="modal-content-card">
+            <video class="unboxing-video-frame" id="popupGiftVideo" muted playsinline><source src="open_gift.mp4" type="video/mp4"></video>
+            <div class="prize-reveal-layer" id="prizeRevealContainer">
+                <span class="prize-icon" id="modalIcon">🎁</span>
+                <h3 class="prize-title" id="modalTitle">Title</h3>
+                <p class="prize-text" id="modalDescription">Description</p>
+                <a href="#" target="_blank" class="gopay-claim-btn" id="modalActionLink">Claim</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let boxesOpenedCount = 0;
+
+        // PROGRAM PEMUTAR MUSIK DENGAN ANTI-BLOCKING BROWSER
+        function initBackgroundMusic() {
+            const music = document.getElementById('bgMusic');
+            music.volume = 0.20; // Set volume halus agar tidak mengagetkan telinga
+            
+            function startPlayback() {
+                music.play().then(() => {
+                    // Jika musik berhasil diputar, hapus semua event listener pemicu
+                    document.removeEventListener('click', startPlayback);
+                    document.removeEventListener('touchstart', startPlayback);
+                }).catch(err => console.log("Menunggu interaksi user untuk memutar audio..."));
+            }
+            
+            // Pasang pemicu ketukan pertama di layar HP
+            document.addEventListener('click', startPlayback);
+            document.addEventListener('touchstart', startPlayback);
+        }
+
+        // TYPEWRITER ENGINE
+        function runTypewriter(elementId, typingSpeed, initialDelay, callback) {
+            const element = document.getElementById(elementId);
+            const targetText = element.getAttribute('data-raw-text');
+            element.innerHTML = ''; element.style.opacity = '1';
+            setTimeout(() => {
+                let charIndex = 0;
+                function typeNextCharacter() {
+                    if (charIndex < targetText.length) {
+                        if (targetText.charAt(charIndex) === '<') {
+                            let closingTagIndex = targetText.indexOf('>', charIndex);
+                            if (closingTagIndex !== -1) { element.innerHTML += targetText.substring(charIndex, closingTagIndex + 1); charIndex = closingTagIndex + 1; }
+                        } else { element.innerHTML += targetText.charAt(charIndex); charIndex++; }
+                        setTimeout(typeNextCharacter, typingSpeed);
+                    } else if (callback) { callback(); }
+                }
+                typeNextCharacter();
+            }, initialDelay * 1000);
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            ['animateTitle', 'animateSubtitle', 'letterTitle', 'letterBody'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) { el.setAttribute('data-raw-text', el.innerHTML); el.innerHTML = ''; }
+            });
+            runTypewriter('animateTitle', 70, 0.3, () => { runTypewriter('animateSubtitle', 50, 0.1, () => { document.getElementById('scrollHintArrow').classList.add('show'); }); });
+            instantiateAbsoluteGameHotspots();
+            initBackgroundMusic(); // Jalankan inisialisasi musik latar
+        });
+
+        // Scroll Tracking Engine
+        const scroller = document.getElementById('mainScroller');
+        const vWrap1 = document.getElementById('vWrap1'); const uiFx1 = document.getElementById('uiFx1'); const viewHeight = window.innerHeight;
+        scroller.addEventListener('scroll', () => {
+            let scrollTop = scroller.scrollTop; let scrollPercent = scrollTop / viewHeight;
+            if (scrollPercent <= 1) { vWrap1.style.transform = `scale(${1 + (scrollPercent * 0.08)})`; vWrap1.style.filter = `blur(${scrollPercent * 8}px)`; vWrap1.style.opacity = `${1 - (scrollPercent * 1.2)}`; uiFx1.style.opacity = `${1 - (scrollPercent * 2)}`; uiFx1.style.transform = `translateY(${scrollPercent * -50}px)`; }
+        });
+
+        // CALENDAR UNLOCK
+        document.getElementById('june10Target').addEventListener('click', () => {
+            scroller.classList.add('locked'); document.getElementById('letterScreen').classList.add('reveal');
+            runTypewriter('letterTitle', 80, 1.2, () => { runTypewriter('letterBody', 35, 0.2, () => { document.getElementById('nextToTreeBtn').classList.add('show'); }); });
+        });
+
+        // WISH ROUTER
+        document.getElementById('nextToTreeBtn').addEventListener('click', () => { document.getElementById('letterScreen').style.display = 'none'; document.getElementById('candleScreen').classList.add('reveal'); setupMicAudioEngine(); });
+
+        function setupMicAudioEngine() {
+            navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)(); const analyser = audioCtx.createAnalyser(); const source = audioCtx.createMediaStreamSource(stream); source.connect(analyser); analyser.fftSize = 256; const dataArray = new Uint8Array(analyser.frequencyBinCount);
+                function listen() {
+                    analyser.getByteFrequencyData(dataArray); let energy = 0; for(let i = 0; i < 10; i++) { energy += dataArray[i]; }
+                    if (energy > 800) { extinguishCandle(); stream.getTracks().forEach(t => t.stop()); } else { requestAnimationFrame(listen); }
+                }
+                setTimeout(listen, 1200);
+            }).catch(() => { document.getElementById('candleFlameWrapper').addEventListener('click', extinguishCandle); });
+        }
+
+        function extinguishCandle() {
+            document.getElementById('candleFlame').style.display = 'none';
+            setTimeout(() => { document.getElementById('candleScreen').style.display = 'none'; document.getElementById('treeScreen').classList.add('reveal'); }, 800);
+        }
+
+        /* --- THE ACCURATE COORDINATE BOX DICTIONARY MATRIX --- */
+        const prizeDataMatrix = [
+            { winner: false, icon: "😹", title: "GADAAAA!", desc: "Pilih lagi!", top: "77%", left: "1%", width: "10%", height: "7%" },
+            { winner: false, icon: "😹", title: "Kosong!", desc: "Coba lagi!", top: "85%", left: "1%", width: "10%", height: "5%" },
+            { winner: false, icon: "😼", title: "yahh gada juga!", desc: "Coba lagi!", top: "90%", left: "1%", width: "20%", height: "14%" },
+            { winner: true,  icon: "🎟️", title: "nah dapet 1, cari lagi 1!", desc: "TAHNIAH!", url: "PASTE_LINK_2", top: "83%", left: "12%", width: "15%", height: "7%" },
+            { winner: false, icon: "😹", title: "KOSONGGG!", desc: "Coba lagi!", top: "91%", left: "23%", width: "17%", height: "7%" },
+            { winner: false, icon: "😹", title: "Kosong!", desc: "Coba lagi!", top: "89%", left: "42%", width: "17%", height: "8%" },
+            { winner: false, icon: "😻", title: "teneneng KOSONG!", desc: "Coba lagi!", top: "89%", left: "60%", width: "17%", height: "8%" },
+            { winner: true,  icon: "🎟️", title: "CIEEEE TAHNIAH BABEE!", desc: "TAHNIAH!", url: "PASTE_LINK_4", top: "77%", left: "54%", width: "30%", height: "8%"}
+        ];
+
+        function instantiateAbsoluteGameHotspots() {
+            const treeScreen = document.getElementById('treeScreen');
+            const modal = document.getElementById('videoModal');
+            const video = document.getElementById('popupGiftVideo');
+            const payload = document.getElementById('prizeRevealContainer');
+            const actionBtn = document.getElementById('modalActionLink');
+
+            prizeDataMatrix.forEach((gift) => {
+                const block = document.createElement('div');
+                block.className = 'hotspot-node';
+                block.style.top = gift.top; block.style.left = gift.left; block.style.width = gift.width; block.style.height = gift.height;
+                
+                block.addEventListener('click', () => {
+                    if (block.classList.contains('opened')) return;
+                    block.classList.add('opened');
+                    
+                    boxesOpenedCount++;
+
+                    document.getElementById('modalIcon').innerText = gift.icon;
+                    document.getElementById('modalTitle').innerText = gift.title;
+                    document.getElementById('modalDescription').innerText = gift.desc;
+                    actionBtn.onclick = null; 
+
+                    if (gift.winner) {
+                        payload.classList.remove('active');
+                        video.style.display = 'block';
+                        modal.classList.add('show');
+                        video.currentTime = 0;
+                        video.play();
+
+                        video.onended = () => {
+                            video.style.display = 'none'; 
+                            actionBtn.href = gift.url;
+                            actionBtn.innerText = "Claim";
+                            actionBtn.style.display = 'block';
+                            payload.classList.add('active'); 
+                        };
+                    } else {
+                        video.style.display = 'none';
+                        video.onended = null;
+                        actionBtn.style.display = 'none';
+                        modal.classList.add('show');
+                        payload.classList.add('active');
+                    }
+                });
+                treeScreen.appendChild(block);
+            });
+
+            modal.addEventListener('click', (e) => { 
+                if (e.target === modal) {
+                    // SISTEM KUNCI ANTI-SKIP SAAT VIDEO SEDANG BERJALAN
+                    if (video.style.display === 'block') return;
+
+                    modal.classList.remove('show');
+                    
+                    if (boxesOpenedCount >= prizeDataMatrix.length) {
+                        setTimeout(() => {
+                            document.getElementById('treeScreen').style.opacity = '0';
+                            document.getElementById('closingScreen').classList.add('reveal');
+                        }, 500);
+                    }
+                } 
+            });
+        }
+    </script>
+</body>
+</html>
