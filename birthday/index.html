@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Happy Birthday, Beautiful! 💕</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Playfair+Display:ital,wght@0,600;1,400&family=Montserrat:wght@300;500&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --rose-dark: #9D174D;
+            --pink-base: #FFDEE9;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100dvh;
+            overflow: hidden;
+            background-color: var(--pink-base);
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        /* Essential Scroll Snap Container for smooth app-like swiping */
+        .scroll-container {
+            width: 100%;
+            height: 100dvh;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Full Screen Section Block */
+        .section {
+            position: relative;
+            width: 100%;
+            height: 100dvh;
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* Video Background Base Alignment */
+        video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
+        }
+
+        /* Dimming Overlay for Page 1 */
+        .dim-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* Mixes a soft dark rose vignette for deep color aesthetics */
+            background: linear-gradient(180deg, rgba(15, 10, 25, 0.6) 0%, rgba(76, 5, 25, 0.45) 100%);
+            z-index: 2;
+        }
+
+        /* Typography & Interactive Content Foreground Layer */
+        .ui-foreground {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            z-index: 3;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+            text-align: center;
+        }
+
+        /* --- SECTION 1 TEXT & DESIGN EDITS --- */
+        .welcome-title {
+            font-family: 'Dancing Script', cursive;
+            font-size: 3.5rem;
+            color: #FFF;
+            margin-bottom: 15px;
+            text-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            opacity: 0;
+            transform: translateY(20px);
+            animation: elegantFadeIn 1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+            animation-delay: 0.3s;
+        }
+
+        .welcome-subtitle {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 1.3rem;
+            color: var(--pink-base);
+            letter-spacing: 1px;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+            opacity: 0;
+            transform: translateY(20px);
+            animation: elegantFadeIn 1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+            animation-delay: 0.9s;
+        }
+
+        /* Pulsing Scroll Indicator Hint */
+        .scroll-hint {
+            margin-top: auto;
+            margin-bottom: calc(30px + env(safe-area-inset-bottom));
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.7);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            animation: hintPulse 2s infinite ease-in-out;
+            opacity: 0;
+            animation: hintFadeIn 1s forwards;
+            animation-delay: 1.5s;
+        }
+
+        @keyframes elegantFadeIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes hintFadeIn { to { opacity: 0.7; } }
+        @keyframes hintPulse {
+            0%, 100% { transform: translateY(0); opacity: 0.4; }
+            50% { transform: translateY(-8px); opacity: 0.9; }
+        }
+
+        /* --- SECTION 2 OVERLAY: INVISIBLE CALENDAR HOTSPOT --- */
+        .calendar-hotspot {
+            position: absolute;
+            /* Adjust these geometric boundaries based on where June 10th settles on your canvas design layout */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.01); /* Invisible click boundary */
+            cursor: pointer;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="scroll-container">
+
+        <section class="section">
+            <video autoplay loop muted playsinline webkit-playsinline>
+                <source src="carousel.mp4" type="video/mp4">
+            </video>
+            <div class="dim-overlay"></div>
+            
+            <div class="ui-foreground">
+                <h1 class="welcome-title">For My Favorite Person...</h1>
+                <p class="welcome-subtitle">A little digital lookbook of you.</p>
+                
+                <div class="scroll-hint">Scroll Down ➔</div>
+            </div>
+        </section>
+
+        <section class="section">
+            <video autoplay loop muted playsinline webkit-playsinline>
+                <source src="calendar.mp4" type="video/mp4">
+            </video>
+            
+            <div class="ui-foreground">
+                <div class="calendar-hotspot" id="june10Target"></div>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        // Placeholder trigger to track when she unlocks the calendar gate
+        document.getElementById('june10Target').addEventListener('click', () => {
+            alert("June 10th unlocked! (We will link your Strawberry Drip video here next)");
+        });
+    </script>
+</body>
+</html>
